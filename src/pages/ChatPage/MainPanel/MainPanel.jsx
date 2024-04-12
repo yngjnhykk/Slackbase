@@ -10,7 +10,7 @@ const MainPanel = () => {
         style={{
           width: '100%',
           height: 450,
-          border: '0.2rem solid #febe98',
+          border: '0.2rem solid #ececec',
           borderRadius: 4,
           padding: '1rem',
           marginBottom: '1rem',
