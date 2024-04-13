@@ -1,39 +1,39 @@
 import { useEffect } from 'react';
 import { Route, Routes, useNavigate } from 'react-router-dom';
 
-import './App.css';
 import ChatPage from './pages/ChatPage/ChatPage';
 import LoginPage from './pages/LoginPage/LoginPage';
 import RegisterPage from './pages/RegisterPage/RegisterPage';
+
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import app from './firebase';
+
 import { useDispatch } from 'react-redux';
 import { clearUser, setUser } from './store/userSlice';
+import app from './firebase';
 
 function App() {
-  const auth = getAuth(app);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = getAuth(app);
 
   useEffect(() => {
-    const unSubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         navigate('/');
-        dispatch(
-          setUser({
-            uid: user.uid,
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-          })
-        );
+        const userData = {
+          uid: user.uid,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+        };
+        dispatch(setUser(userData));
       } else {
-        navigate('/login');
-        dispatch(clearUser());
+        // navigate('/login');
+        // dispatch(clearUser());
       }
     });
 
     return () => {
-      unSubscribe();
+      unsubscribe();
     };
   }, []);
 

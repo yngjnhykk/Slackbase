@@ -5,11 +5,16 @@ import { createUserWithEmailAndPassword, getAuth, updateProfile } from 'firebase
 import { ref, set } from 'firebase/database';
 import app, { db } from '../../firebase';
 import md5 from 'md5';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../store/userSlice';
 
 const RegisterPage = () => {
-  const auth = getAuth(app);
   const [loading, setLoading] = useState(false);
   const [errorFromSubmit, setErrorFromSubmit] = useState('');
+
+  const auth = getAuth(app);
+
+  const dispatch = useDispatch();
 
   const {
     register,
@@ -22,13 +27,20 @@ const RegisterPage = () => {
     try {
       setLoading(true);
       const createdUser = await createUserWithEmailAndPassword(auth, data.email, data.password);
-      console.log(createdUser);
 
-      const updatedUser = await updateProfile(auth.currentUser, {
+      await updateProfile(auth.currentUser, {
         displayName: data.name,
         photoURL: `http://gravatar.com/avatar/${md5(createdUser.user.email)}?d=identicon`,
       });
 
+      const userData = {
+        uid: createdUser.user.uid,
+        displayName: createdUser.user.displayName,
+        photoURL: createdUser.user.photoURL,
+      };
+      dispatch(setUser(userData));
+
+      //Firebase 데이터베이스에 저장해주기
       set(ref(db, `users/${createdUser.user.uid}`), {
         name: createdUser.user.displayName,
         image: createdUser.user.photoURL,
