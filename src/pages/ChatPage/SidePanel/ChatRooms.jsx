@@ -1,10 +1,11 @@
 import React from 'react';
 import { useState } from 'react';
 import { Form, Button, Modal } from 'react-bootstrap';
-import { child, ref as dbRef, push, update } from 'firebase/database';
+import { DataSnapshot, child, ref as dbRef, onChildAdded, push, update } from 'firebase/database';
 import { FaPlus, FaRegSmileWink } from 'react-icons/fa';
 import { db } from '../../../firebase';
 import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
 
 const ChatRooms = () => {
   const [show, setShow] = useState(false);
@@ -20,17 +21,18 @@ const ChatRooms = () => {
   const { currentUser } = useSelector((state) => state.user);
   const dispatch = useDispatch();
 
+  console.log(chatRooms);
+
+  useEffect(() => {
+    addChatRoomsListeners();
+  }, []);
+
   const isFormValid = (name, description) => {
     return name && description;
   };
 
   const handleSubmit = async () => {
-    console.log('handleSubmit 실행');
-    console.log(name);
-    console.log(description);
-    console.log(isFormValid(name, description));
     if (isFormValid(name, description)) {
-      console.log('handleSubmit if 실행');
       const key = push(chatRoomRef).key;
 
       const newChatRoom = {
@@ -54,6 +56,22 @@ const ChatRooms = () => {
     }
   };
 
+  const addChatRoomsListeners = () => {
+    let chatRoomsArray = [];
+
+    onChildAdded(chatRoomRef, (DataSnapshot) => {
+      chatRoomsArray.push(DataSnapshot.val());
+      const newChatRooms = [...chatRoomsArray];
+      setChatRooms(newChatRooms);
+    });
+  };
+
+  const renderedChatRooms = () => {
+    return chatRooms.length > 0 && chatRooms.map((room) => <li key={room.id}>{room.name}</li>);
+  };
+
+  console.log(renderedChatRooms());
+
   return (
     <div>
       <div
@@ -73,6 +91,8 @@ const ChatRooms = () => {
           }}
         />
       </div>
+      <ul style={{ listStyleType: 'none', padding: 0 }}>{renderedChatRooms()}</ul>
+
       <Modal
         show={show}
         onHide={() => {
