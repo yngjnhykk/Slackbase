@@ -4,7 +4,7 @@ import MessageForm from './MessageForm';
 
 const MainPanel = () => {
   return (
-    <div>
+    <div style={{ padding: '2rem 2rem 0 2rem' }}>
       <MessageHeader />
       <div
         style={{
@@ -16,9 +16,8 @@ const MainPanel = () => {
           marginBottom: '1rem',
           overflowY: 'auto',
         }}
-      >
-        <MessageForm />
-      </div>
+      ></div>
+      <MessageForm />
     </div>
   );
 };
