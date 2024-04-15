@@ -77,7 +77,9 @@ const UserPanel = () => {
           dispatch(setPhotoUrl(downloadURL));
 
           // 데이터베이스 유저 이미지 수정
-          update(dbRef(db, `users/${user.uid}`), { image: downloadURL });
+          update(dbRef(db, `users/${user.uid}`), {
+            image: downloadURL,
+          });
         });
       }
     );
@@ -89,11 +91,31 @@ const UserPanel = () => {
         <IoIosChatboxes /> Chat App
       </h3>
 
-      <div style={{ display: 'flex', marginBottom: '1rem' }}>
-        <Image src={currentUser.photoURL} roundedCircle style={{ width: 30, height: 30, marginTop: 3 }} />
+      <div
+        style={{
+          display: 'flex',
+          marginBottom: '1rem',
+        }}
+      >
+        <Image
+          src={currentUser.photoURL}
+          roundedCircle
+          style={{
+            width: 30,
+            height: 30,
+            marginTop: 3,
+          }}
+        />
 
         <Dropdown>
-          <Dropdown.Toggle style={{ backgroundColor: 'transparent', border: 0 }}>{currentUser.diplayName}</Dropdown.Toggle>
+          <Dropdown.Toggle
+            style={{
+              backgroundColor: 'transparent',
+              border: 0,
+            }}
+          >
+            {currentUser.diplayName}
+          </Dropdown.Toggle>
           <Dropdown.Menu>
             <Dropdown.Item onClick={handleOpenImageRef}>프로필 사진 변경</Dropdown.Item>
             <Dropdown.Item onClick={handleLogOut}>로그아웃</Dropdown.Item>
@@ -101,7 +123,13 @@ const UserPanel = () => {
         </Dropdown>
       </div>
 
-      <input onChange={handleUploadImage} type='file' ref={inputOpenImageRef} style={{ display: 'none' }} accept='image/jpeg, image/png' />
+      <input
+        onChange={handleUploadImage}
+        type='file'
+        ref={inputOpenImageRef}
+        style={{ display: 'none' }}
+        accept='image/jpeg, image/png'
+      />
     </div>
   );
 };
