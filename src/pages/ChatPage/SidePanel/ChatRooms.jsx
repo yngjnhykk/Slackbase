@@ -1,11 +1,12 @@
 import React from 'react';
 import { useState } from 'react';
 import { Form, Button, Modal } from 'react-bootstrap';
-import { DataSnapshot, child, ref as dbRef, onChildAdded, push, update } from 'firebase/database';
+import { child, ref as dbRef, off, onChildAdded, push, update } from 'firebase/database';
 import { FaPlus, FaRegSmileWink } from 'react-icons/fa';
 import { db } from '../../../firebase';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
+import { setCurrentChatRoom } from '../../../store/chatRoomSlice';
 
 const ChatRooms = () => {
   const [show, setShow] = useState(false);
@@ -25,6 +26,9 @@ const ChatRooms = () => {
 
   useEffect(() => {
     addChatRoomsListeners();
+    return () => {
+      off(chatRoomRef);
+    };
   }, []);
 
   const isFormValid = (name, description) => {
@@ -63,11 +67,40 @@ const ChatRooms = () => {
       chatRoomsArray.push(DataSnapshot.val());
       const newChatRooms = [...chatRoomsArray];
       setChatRooms(newChatRooms);
+      setFirstChatRoom(newChatRooms);
     });
   };
 
+  const setFirstChatRoom = (chatRooms) => {
+    const firstChatRoom = chatRooms[0];
+    if (firstLoad && chatRooms.length > 0) {
+      dispatch(setCurrentChatRoom(firstChatRoom));
+      setActiveChatRoomId(firstChatRoom.id);
+    }
+    setFirstLoad(false);
+  };
+
+  const changeChatRoom = (room) => {
+    dispatch(setCurrentChatRoom(room));
+    setActiveChatRoomId(room.id);
+  };
+
   const renderedChatRooms = () => {
-    return chatRooms.length > 0 && chatRooms.map((room) => <li key={room.id}>{room.name}</li>);
+    return (
+      chatRooms.length > 0 &&
+      chatRooms.map((room) => (
+        <li
+          onClick={() => changeChatRoom(room)}
+          style={{
+            backgroundColor: room.id === activeChatRoomId ? '#ffffff45' : '',
+            cursor: 'pointer',
+          }}
+          key={room.id}
+        >
+          {room.name}
+        </li>
+      ))
+    );
   };
 
   console.log(renderedChatRooms());
